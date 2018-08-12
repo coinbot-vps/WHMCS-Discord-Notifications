@@ -28,12 +28,18 @@ $GLOBALS['ONEEZYcompanyName'] = "Coinbot VPS";
 $GLOBALS['ONEEZYdesignerGroupID'] = "<@&475771247893151764>";
 // Discord Group ID Config Option. If you wished for each message which is sent to ping a specific group, please place the ID here. An example of a group ID is: @&343029528563548162
 
-$GLOBALS['ONEEZYdiscordWebHookAvatar'] = "https://coinbotvps.com/wp-content/themes/coinbotvps/images/discord/tickets/Ticket";
+$GLOBALS['ONEEZYdiscordWebHookAvatar'] = "https://coinbotvps.com/wp-content/themes/coinbotvps/images/discord/tickets/";
 // (OPTIONAL SETTING) Your desired Webhook Avatar. Please make sure you enter a direct link to the image (E.G. https://example.com/iownpaypal.png).
 
 // https://coinbotvps.com/wp-content/themes/coinbotvps/images/discord/tickets/TicketSupport.png
 // https://coinbotvps.com/wp-content/themes/coinbotvps/images/discord/tickets/TicketSales.png
 // https://coinbotvps.com/wp-content/themes/coinbotvps/images/discord/tickets/TicketBilling.png
+
+// Avatar Colors
+$GLOBALS['ONEEZYavatarRed'] = "Red.png";
+$GLOBALS['ONEEZYavatarOrange'] = "Orange.png";
+$GLOBALS['ONEEZYavatarBlue'] = "Blue.png";
+$GLOBALS['ONEEZYavatarGreen'] = "Green.png";
 
 // Colors
 $GLOBALS['ONEEZYblue'] = "45311";
@@ -71,8 +77,8 @@ $GLOBALS['ONEEZYticketHoldIcon'] = "https://coinbotvps.com/wp-content/themes/coi
 ****************************************************************/
 add_hook('TicketOpen', 1, function($vars)	{
   $dataPacket     = array(
-      'avatar_url' => $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . '.png',
-      'username' => $vars['deptname'].' Ticket',
+      'avatar_url' => $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . 'Red.png',
+      'username' => $vars['deptname'].' Ticket #' . $vars['ticketid'],
       'content' => $GLOBALS['ONEEZYdesignerGroupID'],
       'embeds' => array(
           array(
@@ -83,9 +89,12 @@ add_hook('TicketOpen', 1, function($vars)	{
               ),
               'title' => $vars['subject'],
               'url' => $GLOBALS['ONEEZYwhmcsAdminURL'] . 'supporttickets.php?action=view&id=' . $vars['ticketid'],
-              'description' => $vars['message'],
+              'description' => $vars['message']. '
+                
+                -----------------------------------------
+                [Client](https://billing.coinbotvps.com/admin/clientssummary.php?userid='. $vars['userid'] .')',
+
               'color' => $GLOBALS['ONEEZYred'],
-              'timestamp' => date(DateTime::ISO8601),
               'fields' => array(
                   array(
                       'name' => 'Priority',
@@ -110,11 +119,17 @@ add_hook('TicketOpen', 1, function($vars)	{
 });
 
 /* TICKETS: Answer
+
+($vars['status'] == "Closed") ? 'Green.png' : 
+
 ****************************************************************/
 add_hook('TicketAdminReply', 1, function($vars)	{
     $dataPacket     = array(
-        'avatar_url' => $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . '.png',
-        'username' => $vars['deptname'].' Ticket',
+        // 'avatar_url' => $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . 'Blue.png',
+        // 'avatar_url' => $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . ($vars['status'] == "Closed") ? 'Green.png' : 'Blue.png',
+
+        'avatar_url' => ($vars['status'] == "Closed") ? $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . 'Green.png' : $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . 'Blue.png',
+        'username' => $vars['deptname'].' Ticket #' . $vars['ticketid'],
         'embeds' => array(
             array(
                 'author' => array(
@@ -126,7 +141,6 @@ add_hook('TicketAdminReply', 1, function($vars)	{
                 'url' => $GLOBALS['ONEEZYwhmcsAdminURL'] . 'supporttickets.php?action=view&id=' . $vars['ticketid'],
                 'description' => $vars['message'],
                 'color' => ($vars['status'] == "Closed") ? $GLOBALS['ONEEZYgreen'] : $GLOBALS['ONEEZYblue'],
-                'timestamp' => date(DateTime::ISO8601),
                 'fields' => array(
                     array(
                         'name' => 'Priority',
@@ -141,6 +155,11 @@ add_hook('TicketAdminReply', 1, function($vars)	{
                     array(
                         'name' => 'Ticket ID',
                         'value' => $vars['ticketid'],
+                        'inline' => true
+                    ),
+                    array(
+                        'name' => 'Admin',
+                        'value' => $vars['admin'],
                         'inline' => true
                     )
                 )
@@ -154,8 +173,8 @@ add_hook('TicketAdminReply', 1, function($vars)	{
 ****************************************************************/
 add_hook('TicketUserReply', 1, function($vars)	{
     $dataPacket     = array(
-        'avatar_url' => $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . '.png',
-        'username' => $vars['deptname'].' Ticket',
+        'avatar_url' => $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . 'Orange.png',
+        'username' => $vars['deptname'].' Ticket #' . $vars['ticketid'],
         'content' => $GLOBALS['ONEEZYdesignerGroupID'],
         'embeds' => array(
             array(
@@ -169,9 +188,8 @@ add_hook('TicketUserReply', 1, function($vars)	{
                 'description' => $vars['message']. '
                 
                 -----------------------------------------
-                [hyperlink](https://google.com)',
+                [Client](https://billing.coinbotvps.com/admin/clientssummary.php?userid='. $vars['userid'] .')',
                 'color' => $GLOBALS['ONEEZYorange'],
-                'timestamp' => date(DateTime::ISO8601),
                 'fields' => array(
                     array(
                         'name' => 'Priority',
@@ -188,10 +206,6 @@ add_hook('TicketUserReply', 1, function($vars)	{
                         'value' => $vars['ticketid'],
                         'inline' => true
                     )
-                ),
-                'footer' => array(
-                    'icon_url' => 'https://coinbotvps.com/wp-content/themes/coinbotvps/images/discord/status/status-progress.png',
-                    'text' => '[hyperlink](https://google.com)'
                 )
             )
         )
@@ -205,7 +219,7 @@ add_hook('TicketUserReply', 1, function($vars)	{
 // add_hook('TicketClose', 1, function($vars)	{
 //     $dataPacket     = array(
 //         'avatar_url' => $GLOBALS['ONEEZYdiscordWebHookAvatar'] . $vars['deptname'] . '.png',
-//         'username' => $vars['deptname'].' Ticket',
+//         'username' => $vars['deptname'].' Ticket #' . $vars['ticketid'],
 //         'embeds' => array(
 //             array(
 //                 'author' => array(
@@ -217,7 +231,6 @@ add_hook('TicketUserReply', 1, function($vars)	{
 //                 'url' => $GLOBALS['ONEEZYwhmcsAdminURL'] . 'supporttickets.php?action=view&id=' . $vars['ticketid'],
 //                 'description' => $vars['message'],
 //                 'color' => $GLOBALS['ONEEZYgreen'],
-//                 'timestamp' => date(DateTime::ISO8601),
 //                 'fields' => array(
 //                     array(
 //                         'name' => 'Priority',
